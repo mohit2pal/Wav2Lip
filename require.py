@@ -1,3 +1,7 @@
+# this command is used to download a pre-trained model checkpoint file for the Wav2Lip algorithm. 
+# By downloading the checkpoint file, users can use the pre-trained model to generate realistic 
+# lip movements from an audio signal without having to train the model from scratch.
+
 import os
 
 # Remove the sample_data directory

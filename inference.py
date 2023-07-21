@@ -8,6 +8,13 @@ import torch, face_detection
 from models import Wav2Lip
 import platform
 
+# This file contains the code for lip-syncing videos in the wild using Wav2Lip models.
+# The code defines the command line arguments required for running the inference code.
+# The arguments include the checkpoint path to load weights from, the filepath of the video/image that contains faces to use,
+# the filepath of the video/audio file to use as raw audio source, the video path to save result, and other optional arguments
+# such as padding, batch sizes, cropping, rotation, and face detection. 
+# The code also defines helper functions for face detection, data generation, and smoothening of bounding boxes.
+# The arguments are parsed using argparse module in Python.
 parser = argparse.ArgumentParser(description='Inference code to lip-sync videos in the wild using Wav2Lip models')
 
 parser.add_argument('--checkpoint_path', type=str, 
@@ -55,6 +62,11 @@ args.img_size = 96
 
 if os.path.isfile(args.face) and args.face.split('.')[1] in ['jpg', 'png', 'jpeg']:
 	args.static = True
+ 
+# the get_smoothened_boxes function is used to reduce the noise in the bounding boxes of 
+# detected faces in a video by smoothing out the bounding boxes over a window of size T. 
+# This can help improve the accuracy of the lip-syncing algorithm by reducing the jitter in the 
+# detected face movements.
 
 def get_smoothened_boxes(boxes, T):
 	for i in range(len(boxes)):
@@ -64,6 +76,11 @@ def get_smoothened_boxes(boxes, T):
 			window = boxes[i : i + T]
 		boxes[i] = np.mean(window, axis=0)
 	return boxes
+
+# the face_detect function is a critical component of the Wav2Lip algorithm, 
+# as it is used to detect faces in a video and extract the bounding boxes of the detected faces. 
+# These bounding boxes are then used to crop the video frames and generate realistic lip movements 
+# from an audio signal.
 
 def face_detect(images):
 	detector = face_detection.FaceAlignment(face_detection.LandmarksType._2D, 
@@ -104,6 +121,11 @@ def face_detect(images):
 
 	del detector
 	return results 
+
+# the face_detect function is a critical component of the Wav2Lip algorithm, 
+# as it is used to detect faces in a video and extract the bounding boxes of the detected faces. 
+# These bounding boxes are then used to crop the video frames and generate realistic lip movements 
+# from an audio signal.
 
 def datagen(frames, mels):
 	img_batch, mel_batch, frame_batch, coords_batch = [], [], [], []
@@ -157,6 +179,12 @@ mel_step_size = 16
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 print('Using {} for inference.'.format(device))
 
+# The function first checks if the device is set to 'cuda'. 
+# If it is, the function loads the checkpoint using the torch.load function, 
+# which loads the checkpoint onto the GPU. If the device is not set to 'cuda', 
+# the function loads the checkpoint onto the CPU using the map_location argument of the torch.load 
+# function.
+
 def _load(checkpoint_path):
 	if device == 'cuda':
 		checkpoint = torch.load(checkpoint_path)
@@ -177,6 +205,26 @@ def load_model(path):
 
 	model = model.to(device)
 	return model.eval()
+
+# the main function is the core of the Wav2Lip algorithm, as it is responsible for loading the 
+# input data, generating batches of data, and running the lip-syncing algorithm on the input data.
+# By pairing the mel-spectrograms with the corresponding video frames, the algorithm can learn to 
+# generate realistic lip movements from an audio signal.
+
+# The function first checks if the args.face argument is a valid path to a video or image file. 
+# If the argument is an image file, the function reads the image and sets the frame rate to the 
+# specified args.fps. If the argument is a video file, the function reads the video frames and 
+# sets the frame rate to the frame rate of the video.
+
+# The function then crops the video frames to the specified bounding box using the args.crop argument. 
+# If the args.resize_factor argument is greater than 1, the function resizes the video frames 
+# by the specified factor. If the args.rotate argument is True, the function rotates the video 
+# frames by 90 degrees clockwise.
+
+# The function then loads the audio file and extracts the mel-spectrogram using the 
+# audio.load_wav and audio.melspectrogram functions, respectively. 
+# The mel-spectrogram is divided into chunks of size mel_step_size, where mel_step_size is 
+# calculated based on the frame rate of the video.
 
 def main():
 	if not os.path.isfile(args.face):

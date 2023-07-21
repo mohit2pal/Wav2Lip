@@ -1,3 +1,8 @@
+#  this script is a simple way to execute the Wav2Lip algorithm on a specified 
+#  input video and audio file. By changing the working directory to the Wav2Lip directory 
+#  and executing the inference.py script with the appropriate arguments, users can generate 
+#  realistic lip movements from an audio signal.
+
 import os
 
 # Change directory to Wav2Lip
