@@ -18,7 +18,7 @@ Installation
 ------------
 
 1.  Clone the repository to your local machine.
-2.  Install the required packages using `pip install -r requirements.txt`.
+2.  Install the required packages using `require.py`.
 3.  Download the pre-trained model checkpoint file from the [official Wav2Lip repository](vscode-file://vscode-app/c:/Program%20Files/Microsoft%20VS%20Code%20Insiders/resources/app/out/vs/code/electron-sandbox/workbench/workbench.html "https://github.com/Rudrabha/Wav2Lip#pre-trained-model-checkpoints").
 4.  Place the checkpoint file in the `checkpoints` directory.
 
